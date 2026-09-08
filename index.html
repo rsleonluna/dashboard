@@ -1,0 +1,1510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#9670;</text></svg>">
+<style>
+  :root {
+    --bg: #0b0e14;
+    --bg-soft: #11151f;
+    --panel: #141926;
+    --panel-2: #1a2032;
+    --line: #232a3d;
+    --line-soft: #1b2132;
+    --text: #e3e8f4;
+    --muted: #8b94ad;
+    --dim: #626b83;
+    --accent: #7aa2f7;
+    --accent-dim: #2b3a5e;
+    --green: #7ddb9a;
+    --amber: #e0af68;
+    --pink: #f7768e;
+    --purple: #bb9af7;
+    --radius: 12px;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body { height: 100%; }
+
+  body {
+    margin: 0;
+    background:
+      radial-gradient(1200px 600px at 15% -10%, #16203a 0%, transparent 60%),
+      radial-gradient(900px 500px at 95% 0%, #1b1930 0%, transparent 55%),
+      var(--bg);
+    background-attachment: fixed;
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: inherit; text-decoration: none; }
+
+  ::selection { background: #2d4a86; }
+
+  .wrap {
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 28px 28px 80px;
+  }
+
+  /* ---------- header ---------- */
+
+  header.top {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+    padding-bottom: 20px;
+    margin-bottom: 26px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .greeting {
+    font-size: 26px;
+    font-weight: 650;
+    letter-spacing: -0.4px;
+    margin: 0;
+  }
+
+  .greeting .clock {
+    font-variant-numeric: tabular-nums;
+    color: var(--accent);
+  }
+
+  .subline {
+    color: var(--muted);
+    font-size: 13.5px;
+    margin-top: 3px;
+  }
+
+  .top-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+  .btn {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    color: var(--text);
+    border-radius: 8px;
+    padding: 7px 12px;
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background .13s ease, border-color .13s ease, color .13s ease;
+    white-space: nowrap;
+  }
+  .btn:hover { background: var(--panel-2); border-color: #33405e; }
+  .btn.primary { background: #23345c; border-color: #33507f; color: #dce6ff; }
+  .btn.primary:hover { background: #2a3e6d; }
+  .btn.ghost { background: transparent; }
+  .btn.ghost:hover { background: var(--panel); }
+  .btn[aria-pressed="true"] { background: #23345c; border-color: #3a527f; color: #dce6ff; }
+
+  .quicklinks { display: flex; gap: 6px; }
+  .quicklinks a {
+    display: grid; place-items: center;
+    width: 32px; height: 32px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--panel);
+    font-size: 13px;
+    color: var(--muted);
+    transition: all .13s ease;
+  }
+  .quicklinks a:hover { color: var(--text); border-color: #33405e; background: var(--panel-2); }
+
+  /* ---------- layout ---------- */
+
+  .cols {
+    display: grid;
+    grid-template-columns: minmax(300px, 400px) minmax(0, 1fr);
+    gap: 28px;
+    align-items: start;
+  }
+
+  @media (max-width: 1050px) {
+    .cols { grid-template-columns: 1fr; }
+    .wrap { padding: 20px 16px 60px; }
+  }
+
+  .panel-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 14px;
+    font-size: 12px;
+    font-weight: 650;
+    letter-spacing: 1.3px;
+    text-transform: uppercase;
+    color: var(--dim);
+  }
+  .panel-title .count {
+    font-weight: 500;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--dim);
+    background: var(--panel);
+    border: 1px solid var(--line-soft);
+    border-radius: 20px;
+    padding: 1px 8px;
+    font-size: 11px;
+  }
+  .panel-title .spacer { flex: 1; }
+
+  /* ---------- projects ---------- */
+
+  .proj-list { display: flex; flex-direction: column; gap: 8px; }
+
+  .proj {
+    background: #edeae4;
+    border: 1px solid #d5d1c8;
+    border-radius: var(--radius);
+    padding: 12px 13px;
+    position: relative;
+    color: #2b2c31;
+    transition: border-color .13s ease, background .13s ease, transform .13s ease;
+  }
+  .proj:hover { background: #f4f2ee; border-color: #c2bdb2; }
+  .proj:hover .proj-tools { opacity: 1; }
+
+  .proj-head { display: flex; align-items: center; gap: 8px; }
+
+  .dot { width: 7px; height: 7px; border-radius: 50%; flex: none; }
+  .dot.active { background: var(--green); box-shadow: 0 0 0 3px rgba(125,219,154,.13); }
+  .dot.paused { background: var(--amber); box-shadow: 0 0 0 3px rgba(224,175,104,.12); }
+  .dot.idea   { background: var(--purple); box-shadow: 0 0 0 3px rgba(187,154,247,.12); }
+  .dot.done   { background: #4a5570; }
+  .dot.shelved{ background: #46506b; }
+
+  .proj .dot.active { background: #2f9e5c; box-shadow: 0 0 0 3px rgba(47,158,92,.15); }
+  .proj .dot.paused { background: #b8791b; box-shadow: 0 0 0 3px rgba(184,121,27,.15); }
+  .proj .dot.idea   { background: #7b52c9; box-shadow: 0 0 0 3px rgba(123,82,201,.15); }
+  .proj .dot.done   { background: #9a9ca6; }
+  .proj .dot.shelved{ background: #a6a8b1; }
+
+  .proj-name {
+    font-weight: 600;
+    font-size: 14.5px;
+    letter-spacing: -0.2px;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .proj-when { font-size: 11px; color: var(--dim); font-variant-numeric: tabular-nums; flex: none; }
+
+  .proj-desc {
+    color: var(--muted);
+    font-size: 12.8px;
+    line-height: 1.5;
+    margin: 6px 0 0;
+  }
+
+  .tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+  .tag {
+    font-size: 10.5px;
+    font-family: var(--mono);
+    color: #93a4c9;
+    background: #1b2236;
+    border: 1px solid #252e46;
+    border-radius: 5px;
+    padding: 1px 6px;
+  }
+  .tag.match { color: #a8c5ff; border-color: #33507f; background: #1d2a48; }
+
+  /* project cards are matte white, so their contents flip to dark ink */
+  .proj .proj-name { color: #1c1d21; }
+  .proj .proj-desc { color: #5c5e66; }
+  .proj .proj-when { color: #8a8b93; }
+  .proj .tag { color: #5f6069; background: #e2ded6; border-color: #cfcabf; }
+  .proj .tag.match { color: #2f4a86; background: #dde5f5; border-color: #b6c6e6; }
+  .proj .proj-path { color: #8a8b93; }
+  .proj .proj-path:hover { color: #2f4a86; border-bottom-color: #b6c6e6; }
+
+  .proj-path {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--dim);
+    margin-top: 8px;
+    cursor: pointer;
+    display: inline-block;
+    border-bottom: 1px dashed transparent;
+  }
+  .proj-path:hover { color: var(--accent); border-bottom-color: #33507f; }
+
+  .proj-tools {
+    position: absolute;
+    top: 9px; right: 9px;
+    display: flex;
+    gap: 3px;
+    opacity: 0;
+    transition: opacity .13s ease;
+  }
+  .proj-tools button {
+    background: #e2ded6;
+    border: 1px solid #cfcabf;
+    color: #6c6e77;
+    border-radius: 6px;
+    width: 24px; height: 22px;
+    font-size: 11px;
+    cursor: pointer;
+    display: grid; place-items: center;
+    padding: 0;
+  }
+  .proj-tools button:hover { color: #1c1d21; background: #d3cec3; }
+
+  details.archive { margin-top: 14px; }
+  details.archive > summary {
+    list-style: none;
+    cursor: pointer;
+    color: var(--dim);
+    font-size: 12px;
+    padding: 7px 2px;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  details.archive > summary::-webkit-details-marker { display: none; }
+  details.archive > summary:hover { color: var(--muted); }
+  details.archive > summary .chev { transition: transform .15s ease; font-size: 9px; }
+  details.archive[open] > summary .chev { transform: rotate(90deg); }
+  details.archive .proj-list { margin-top: 6px; }
+
+  /* ---------- news ---------- */
+
+  .controls {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+
+  .chip {
+    background: var(--panel);
+    border: 1px solid var(--line-soft);
+    color: var(--muted);
+    border-radius: 20px;
+    padding: 4px 11px;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all .13s ease;
+  }
+  .chip:hover { color: var(--text); border-color: #33405e; }
+  .chip[aria-pressed="true"] { background: #23345c; border-color: #3a527f; color: #dce6ff; }
+
+  .seg { display: inline-flex; background: var(--panel); border: 1px solid var(--line-soft); border-radius: 8px; overflow: hidden; }
+  .seg button {
+    background: transparent; border: 0; color: var(--muted);
+    font-family: inherit; font-size: 12px; padding: 5px 11px; cursor: pointer;
+  }
+  .seg button + button { border-left: 1px solid var(--line-soft); }
+  .seg button[aria-pressed="true"] { background: #23345c; color: #dce6ff; }
+
+  input.search {
+    background: var(--panel);
+    border: 1px solid var(--line-soft);
+    color: var(--text);
+    border-radius: 8px;
+    padding: 6px 11px;
+    font-family: inherit;
+    font-size: 12.5px;
+    width: 190px;
+    outline: none;
+  }
+  input.search:focus { border-color: #33507f; }
+  input.search::placeholder { color: var(--dim); }
+
+  .feed {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+    gap: 10px;
+  }
+
+  .item {
+    background: var(--panel);
+    border: 1px solid var(--line-soft);
+    border-radius: var(--radius);
+    padding: 13px 14px 11px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    transition: border-color .13s ease, background .13s ease;
+  }
+  .item:hover { border-color: #2e3a57; background: #161c2b; }
+  .item:hover .item-tools { opacity: 1; }
+  .item.unseen { border-left: 2px solid var(--accent); }
+
+  .item-src {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 10.5px;
+    font-family: var(--mono);
+    letter-spacing: .3px;
+    color: var(--dim);
+    margin-bottom: 7px;
+    white-space: nowrap;
+  }
+  .item-src .meta { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .src-badge {
+    padding: 1px 6px;
+    border-radius: 5px;
+    border: 1px solid;
+    text-transform: uppercase;
+    font-size: 9.5px;
+    letter-spacing: .6px;
+    white-space: nowrap;
+    flex: none;
+  }
+  .src-hn      { color: #ffa07a; border-color: #4a3025; background: #241a15; }
+  .src-github  { color: #a8b6d6; border-color: #2c3350; background: #1a1f30; }
+  .src-devto   { color: #b8a6f0; border-color: #38305a; background: #1e1a30; }
+  .src-hf      { color: #f2d68a; border-color: #4a4022; background: #241f14; }
+
+  .item-title {
+    font-size: 14.2px;
+    font-weight: 560;
+    letter-spacing: -0.15px;
+    line-height: 1.42;
+    margin: 0;
+  }
+  .item-title a:hover { color: var(--accent); }
+
+  .item-desc {
+    color: var(--muted);
+    font-size: 12.5px;
+    line-height: 1.5;
+    margin: 7px 0 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .item-foot {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-top: auto;
+    padding-top: 11px;
+    font-size: 11.5px;
+    color: var(--dim);
+    font-variant-numeric: tabular-nums;
+  }
+  .item-foot .why { display: flex; gap: 4px; flex-wrap: wrap; }
+  .item-foot .spacer { flex: 1; }
+
+  .relev {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 5px;
+    border: 1px solid #33507f;
+    background: #1d2a48;
+    color: #a8c5ff;
+  }
+
+  .item-tools { display: flex; gap: 4px; opacity: 0; transition: opacity .13s ease; }
+  .item-tools button, .item-tools a {
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    color: var(--muted);
+    border-radius: 6px;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-family: inherit;
+    cursor: pointer;
+    line-height: 1.5;
+  }
+  .item-tools button:hover, .item-tools a:hover { color: var(--text); background: #26304a; border-color: #33405e; }
+  .item-tools button.saved { color: var(--amber); border-color: #4a3c22; background: #241f14; }
+
+  .empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: var(--dim);
+    padding: 46px 20px;
+    border: 1px dashed var(--line);
+    border-radius: var(--radius);
+    font-size: 13px;
+  }
+
+  .skel {
+    background: var(--panel);
+    border: 1px solid var(--line-soft);
+    border-radius: var(--radius);
+    height: 132px;
+    position: relative;
+    overflow: hidden;
+  }
+  .skel::after {
+    content: "";
+    position: absolute; inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,.03), transparent);
+    animation: sweep 1.3s infinite;
+  }
+  @keyframes sweep { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+
+  .status-line {
+    font-size: 11.5px;
+    color: var(--dim);
+    margin-top: 16px;
+    font-family: var(--mono);
+  }
+  .status-line .err { color: var(--pink); }
+
+  /* ---------- modal ---------- */
+
+  dialog {
+    background: var(--panel);
+    color: var(--text);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 0;
+    width: min(460px, calc(100vw - 32px));
+    box-shadow: 0 24px 60px rgba(0,0,0,.6);
+  }
+  dialog::backdrop { background: rgba(5,7,12,.72); backdrop-filter: blur(2px); }
+  dialog form { padding: 20px; }
+  dialog h3 { margin: 0 0 16px; font-size: 15px; font-weight: 620; }
+  .field { margin-bottom: 12px; }
+  .field label { display: block; font-size: 11px; color: var(--dim); margin-bottom: 4px; letter-spacing: .4px; text-transform: uppercase; }
+  .field input, .field textarea, .field select {
+    width: 100%;
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    color: var(--text);
+    border-radius: 8px;
+    padding: 7px 10px;
+    font-family: inherit;
+    font-size: 13px;
+    outline: none;
+    resize: vertical;
+  }
+  .field input:focus, .field textarea:focus, .field select:focus { border-color: #33507f; }
+  .field .hint { font-size: 11px; color: var(--dim); margin-top: 4px; }
+  .dialog-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; }
+  .dialog-actions .left { margin-right: auto; }
+
+  .toast {
+    position: fixed;
+    bottom: 22px; left: 50%;
+    transform: translateX(-50%) translateY(12px);
+    background: #1e2540;
+    border: 1px solid #33507f;
+    color: #dce6ff;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 12.5px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .18s ease, transform .18s ease;
+    z-index: 99;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div>
+      <h1 class="greeting"><span id="greet">Hello</span> &middot; <span class="clock" id="clock">--:--</span></h1>
+      <div class="subline" id="subline">&nbsp;</div>
+    </div>
+    <div class="top-actions">
+      <div class="quicklinks">
+        <a href="https://github.com/" target="_blank" title="GitHub">GH</a>
+        <a href="https://news.ycombinator.com/" target="_blank" title="Hacker News">HN</a>
+        <a href="https://claude.ai/new" target="_blank" title="Claude">AI</a>
+        <a href="https://mail.google.com/" target="_blank" title="Gmail">@</a>
+      </div>
+      <button class="btn ghost" id="btn-interests">Interests</button>
+      <button class="btn" id="btn-add-proj">+ Project</button>
+      <button class="btn primary" id="btn-refresh">Refresh feed</button>
+    </div>
+  </header>
+
+  <div class="cols">
+
+    <!-- ============ projects ============ -->
+    <section>
+      <h2 class="panel-title">
+        Projects
+        <span class="count" id="proj-count">0</span>
+        <span class="spacer"></span>
+        <button class="btn ghost" id="btn-export" style="font-size:11px;padding:3px 8px">Export</button>
+      </h2>
+
+      <div class="proj-list" id="proj-active"></div>
+
+      <details class="archive" id="archive-block">
+        <summary><span class="chev">&#9656;</span> <span id="archive-label">Archive</span></summary>
+        <div class="proj-list" id="proj-archive"></div>
+      </details>
+    </section>
+
+    <!-- ============ news ============ -->
+    <section>
+      <h2 class="panel-title">
+        Signal
+        <span class="count" id="news-count">0</span>
+        <span class="spacer"></span>
+        <span class="count" id="new-count" hidden>0 new</span>
+      </h2>
+
+      <div class="controls">
+        <div class="seg" id="sortseg">
+          <button data-sort="relevant" aria-pressed="true">For me</button>
+          <button data-sort="hot" aria-pressed="false">Hot</button>
+          <button data-sort="new" aria-pressed="false">Newest</button>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap" id="srcchips">
+          <button class="chip" data-src="hn" aria-pressed="true">Hacker News</button>
+          <button class="chip" data-src="github" aria-pressed="true">GitHub</button>
+          <button class="chip" data-src="devto" aria-pressed="true">Dev.to</button>
+          <button class="chip" data-src="hf" aria-pressed="true">Hugging Face</button>
+        </div>
+        <button class="chip" id="chip-saved" aria-pressed="false">&#9733; Saved</button>
+        <input class="search" id="search" type="search" placeholder="filter&hellip;" autocomplete="off">
+      </div>
+
+      <div class="feed" id="feed"></div>
+      <div class="status-line" id="status"></div>
+    </section>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ============ project editor ============ -->
+<dialog id="proj-dialog">
+  <form method="dialog" id="proj-form">
+    <h3 id="proj-dialog-title">Edit project</h3>
+    <input type="hidden" name="id">
+    <div class="field">
+      <label for="pf-name">Name</label>
+      <input id="pf-name" name="name" required>
+    </div>
+    <div class="field">
+      <label for="pf-desc">What it is</label>
+      <textarea id="pf-desc" name="desc" rows="3"></textarea>
+    </div>
+    <div class="field">
+      <label for="pf-tags">Stack / tags</label>
+      <input id="pf-tags" name="tags" placeholder="python, three.js, llm">
+      <div class="hint">Comma separated. These also feed the relevance scoring.</div>
+    </div>
+    <div class="field">
+      <label for="pf-path">Path or URL</label>
+      <input id="pf-path" name="path" placeholder="~/dev/thing">
+    </div>
+    <div class="field">
+      <label for="pf-updated">Last touched</label>
+      <input id="pf-updated" name="updated" type="date">
+    </div>
+    <div class="field">
+      <label for="pf-status">Status</label>
+      <select id="pf-status" name="status">
+        <option value="active">Active</option>
+        <option value="paused">Paused</option>
+        <option value="idea">Idea</option>
+        <option value="done">Done</option>
+        <option value="shelved">Shelved</option>
+      </select>
+    </div>
+    <div class="dialog-actions">
+      <button type="button" class="btn left" id="pf-delete" style="color:#f7768e">Delete</button>
+      <button type="button" class="btn" id="pf-cancel">Cancel</button>
+      <button type="submit" class="btn primary" value="save">Save</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- ============ interests editor ============ -->
+<dialog id="int-dialog">
+  <form method="dialog" id="int-form">
+    <h3>What counts as interesting</h3>
+    <div class="field">
+      <label for="if-kw">Keywords</label>
+      <textarea id="if-kw" name="kw" rows="7"></textarea>
+      <div class="hint">One per line, or comma separated. A story matching any of these gets boosted. Your project tags are matched automatically too.</div>
+    </div>
+    <div class="field">
+      <label for="if-mute">Mute</label>
+      <textarea id="if-mute" name="mute" rows="3"></textarea>
+      <div class="hint">Anything matching these is hidden from the feed.</div>
+    </div>
+    <div class="dialog-actions">
+      <button type="button" class="btn" id="if-cancel">Cancel</button>
+      <button type="submit" class="btn primary">Save</button>
+    </div>
+  </form>
+</dialog>
+<script>
+"use strict";
+
+/* =====================================================================
+   storage
+   ===================================================================== */
+
+const KEY = {
+  projects:  "homebase.projects.v1",
+  interests: "homebase.interests.v1",
+  cache:     "homebase.newscache.v1",
+  seen:      "homebase.seen.v1",
+  saved:     "homebase.saved.v1",
+  prefs:     "homebase.prefs.v1",
+};
+
+function load(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw === null ? fallback : JSON.parse(raw);
+  } catch (e) { return fallback; }
+}
+function save(key, value) {
+  try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
+}
+
+/* =====================================================================
+   seed data
+   ===================================================================== */
+
+const DEFAULT_PROJECTS = [
+  { id:"jobagent", name:"jobagent", status:"active", updated:"2026-08-24",
+    path:"~/job-application-automation-platform",
+    desc:"Local-first job application pipeline: ingest public ATS postings, extract facts with a local LLM, score fit, retrieve evidence, draft a tailored cover letter, autofill for manual review.",
+    tags:["python","uv","local llm","agents","scraping","ats"] },
+
+  { id:"sunfish-gen", name:"sunfish-gen", status:"active", updated:"2026-08-11",
+    path:"~/dev/sunfish-gen",
+    desc:"Parametric Blender generator that builds a Sunfish sailboat from dataclasses and exports GLB for a sailing sim running in Three.js and UE5.",
+    tags:["python","blender","gltf","procedural","3d"] },
+
+  { id:"sunfish-sim", name:"sunfish-sim", status:"active", updated:"2026-08-11",
+    path:"~/dev/sunfish-sim",
+    desc:"The sailing simulator front end that consumes the generated boat. React + TypeScript + Vite.",
+    tags:["react","typescript","vite","three.js","webgl","simulation","physics"] },
+
+  { id:"email-deletion-tool", name:"email-deletion-tool", status:"active", updated:"2026-08-06",
+    path:"~/email-deletion-tool",
+    desc:"A local review queue for Gmail. One email at a time with a one-line summary from a local model, then keep / delete / unsubscribe.",
+    tags:["python","gmail api","local llm","automation","privacy"] },
+
+  { id:"personal-website", name:"personal-website", status:"active", updated:"2026-08-05",
+    path:"~/personal-website",
+    desc:"Personal site: projects and contact, hand-written HTML and CSS.",
+    tags:["html","css","web"] },
+
+  { id:"3d-odin", name:"3D-odin-project", status:"active", updated:"2026-08-05",
+    path:"~/3D-odin-project",
+    desc:"A 3D render of The Odin Project logo, built with React Three Fiber.",
+    tags:["react three fiber","three.js","webgl","vite","3d"] },
+
+  { id:"water-tutorial", name:"chatgpt-water-tutorial", status:"paused", updated:"2026-07-21",
+    path:"~/my-side-projects/chatgpt-water-tutorial",
+    desc:"Realistic water renderer using Three.js. Open-source graphics showcase.",
+    tags:["three.js","shaders","webgl","typescript","graphics"] },
+
+  { id:"three", name:"three", status:"paused", updated:"2026-06-30",
+    path:"~/my-side-projects/three",
+    desc:"Three.js sketchpad.",
+    tags:["three.js","webgl","javascript"] },
+
+  { id:"jink-swift", name:"Jink_Swift", status:"paused", updated:"2026-05-01",
+    path:"~/my-side-projects/Jink_Swift",
+    desc:"Native iOS app for exploring architectural landmarks through guided walks and building identification. Rebuilt in Swift with the Aura Profile personalization system.",
+    tags:["swift","ios","sql","maps","computer vision","architecture"] },
+
+  { id:"bertos-arcade", name:"bertos-arcade", status:"shelved", updated:"2026-04-18",
+    path:"~/my-side-projects/bertos-arcade",
+    desc:"Browser arcade experiment.",
+    tags:["html","games","canvas"] },
+
+  { id:"news", name:"news", status:"shelved", updated:"2026-03-11",
+    path:"~/my-side-projects/news",
+    desc:"An earlier take on a news page.",
+    tags:["html","rss","news"] },
+
+  { id:"lawrence-takehome", name:"lawrence-takehome", status:"done", updated:"2026-03-06",
+    path:"~/my-side-projects/lawrence-takehome",
+    desc:"Take-home exercise.",
+    tags:["interview"] },
+
+  { id:"upworktracks", name:"UpworkTracks", status:"shelved", updated:"2026-02-24",
+    path:"~/my-side-projects/UpworkTracks",
+    desc:"Freelance work tracker.",
+    tags:["html","tracking"] },
+
+  { id:"odin-project", name:"odin-project", status:"paused", updated:"2026-02-24",
+    path:"~/my-side-projects/odin-project",
+    desc:"The Odin Project coursework: HTML, CSS and JavaScript exercises.",
+    tags:["html","css","javascript","learning"] },
+
+  { id:"haystack", name:"Haystack", status:"shelved", updated:"2026-02-24",
+    path:"~/my-side-projects/Haystack",
+    desc:"Search / retrieval experiment across Python and TypeScript.",
+    tags:["python","typescript","search","rag"] },
+
+  { id:"video-editing", name:"video-editing", status:"shelved", updated:"2026-02-20",
+    path:"~/my-side-projects/video-editing",
+    desc:"Python scripts for automated video editing.",
+    tags:["python","video","ffmpeg","automation"] },
+
+  { id:"leetcodelock", name:"LeetCodeLock", status:"idea", updated:"2026-02-20",
+    path:"~/my-side-projects/LeetCodeLock",
+    desc:"Lock something behind solving a LeetCode problem.",
+    tags:["productivity","browser extension"] },
+
+  { id:"nowplaying", name:"NowPlaying", status:"paused", updated:"2026-02-04",
+    path:"~/my-side-projects/NowPlaying",
+    desc:"Swift app around now-playing media state.",
+    tags:["swift","macos","ios","media"] },
+
+  { id:"yaagff", name:"YAAGFF_fitbit", status:"shelved", updated:"2026-01-04",
+    path:"~/my-side-projects/YAAGFF_fitbit",
+    desc:"Fitbit data pulled on a schedule and pushed out to SMS message groups.",
+    tags:["python","fitbit","wearables","api","automation"] },
+
+  { id:"swervo", name:"Swervo_V1", status:"shelved", updated:"2025-08-26",
+    path:"~/my-side-projects/Swervo_V1",
+    desc:"React Native app for exploring architectural landmarks through guided walks and building identification.",
+    tags:["react native","mobile","maps","architecture"] },
+
+  { id:"architecture-beta", name:"ArchitectureApp_Beta", status:"shelved", updated:"2025-07-22",
+    path:"~/my-side-projects/ArchitectureApp_Beta",
+    desc:"Point, scan and learn about the buildings around you. Camera plus location identifies nearby architecture and you collect stamps for places you visit.",
+    tags:["mobile","camera","geolocation","computer vision","architecture"] },
+
+  { id:"foodbank", name:"foodbank", status:"shelved", updated:"2025-07-08",
+    path:"~/my-side-projects/foodbank",
+    desc:"Food bank tooling. TypeScript with a SQL schema.",
+    tags:["typescript","sql","civic"] },
+
+  { id:"printing-press", name:"printing-press", status:"shelved", updated:"2025-07-05",
+    path:"~/my-side-projects/printing-press",
+    desc:"Small web build.",
+    tags:["html","css","javascript"] },
+];
+
+const DEFAULT_INTERESTS = {
+  keywords: [
+    "three.js","webgl","webgpu","shader","graphics","rendering","raytracing",
+    "blender","gltf","glb","procedural","3d","simulation","physics","game engine",
+    "llm","local model","on-device","inference","agent","mcp","rag","embedding","fine-tune",
+    "python","typescript","rust","swift","ios","react","vite","react native",
+    "cli","tui","self-hosted","local-first","scraping","automation","browser extension",
+    "sailing","robotics","wearable","fitbit","sensor","arduino","raspberry pi",
+    "architecture","maps","geospatial","computer vision",
+  ],
+  mute: [],
+};
+
+const SOURCE_LABEL = { hn:"Hacker News", github:"GitHub", devto:"Dev.to", hf:"Hugging Face" };
+const SOURCE_BADGE = { hn:"HN", github:"GitHub", devto:"Dev.to", hf:"HF" };
+
+/* =====================================================================
+   state
+   ===================================================================== */
+
+let projects  = load(KEY.projects, null) || DEFAULT_PROJECTS.slice();
+let interests = load(KEY.interests, null) || JSON.parse(JSON.stringify(DEFAULT_INTERESTS));
+let seen      = new Set(load(KEY.seen, []));
+let savedIds  = new Set(load(KEY.saved, []));
+let prefs     = Object.assign({ sort:"relevant", sources:{hn:true,github:true,devto:true,hf:true}, savedOnly:false }, load(KEY.prefs, {}));
+let items     = [];
+let query     = "";
+let sessionNew = new Set();   // ids that were unseen when this page loaded
+
+const $  = (sel) => document.querySelector(sel);
+const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+
+/* =====================================================================
+   small helpers
+   ===================================================================== */
+
+// Dev.to and friends return HTML entities inside JSON strings, so "&nbsp;" and
+// "&#39;" would otherwise render literally once we escape the text.
+const decoder = document.createElement("textarea");
+function decodeEntities(s) {
+  if (!s || s.indexOf("&") === -1) return s || "";
+  decoder.innerHTML = s;
+  return decoder.value;
+}
+
+function esc(s) {
+  return String(s == null ? "" : s)
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+}
+
+function hostOf(url) {
+  try { return new URL(url).hostname.replace(/^www\./, ""); } catch (e) { return ""; }
+}
+
+function ago(ts) {
+  if (!ts) return "";
+  const s = Math.max(1, Math.floor((Date.now() - ts) / 1000));
+  if (s < 3600)  return Math.floor(s/60) + "m";
+  if (s < 86400) return Math.floor(s/3600) + "h";
+  const d = Math.floor(s/86400);
+  if (d < 30)  return d + "d";
+  if (d < 365) return Math.floor(d/30) + "mo";
+  return Math.floor(d/365) + "y";
+}
+
+function num(n) {
+  if (n == null) return "";
+  return n >= 1000 ? (n/1000).toFixed(n >= 10000 ? 0 : 1).replace(/\.0$/,"") + "k" : String(n);
+}
+
+let toastTimer = null;
+function toast(msg) {
+  const el = $("#toast");
+  el.textContent = msg;
+  el.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove("show"), 1900);
+}
+
+function copy(text, note) {
+  navigator.clipboard.writeText(text).then(
+    () => toast(note || "Copied"),
+    () => toast("Could not copy")
+  );
+}
+
+/* =====================================================================
+   clock
+   ===================================================================== */
+
+function tickClock() {
+  const now = new Date();
+  const h = now.getHours();
+  $("#greet").textContent =
+    h < 5  ? "Still up" :
+    h < 12 ? "Morning"  :
+    h < 17 ? "Afternoon":
+    h < 22 ? "Evening"  : "Late";
+  $("#clock").textContent = now.toLocaleTimeString([], { hour:"numeric", minute:"2-digit" });
+}
+
+function renderSubline() {
+  const active = projects.filter(p => p.status === "active").length;
+  const d = new Date().toLocaleDateString([], { weekday:"long", month:"long", day:"numeric" });
+  $("#subline").textContent = d + "  ·  " + active + " active project" + (active === 1 ? "" : "s");
+}
+
+/* =====================================================================
+   projects
+   ===================================================================== */
+
+const STATUS_ORDER = { active:0, paused:1, idea:2, done:3, shelved:4 };
+
+function persistProjects() {
+  save(KEY.projects, projects);
+  renderProjects();
+  renderSubline();
+  scoreAll();
+  renderFeed();
+}
+
+function projectCard(p) {
+  const tags = (p.tags || []).map(t => '<span class="tag">' + esc(t) + "</span>").join("");
+  return '' +
+    '<article class="proj" data-id="' + esc(p.id) + '">' +
+      '<div class="proj-tools">' +
+        '<button data-act="edit" title="Edit">&#9998;</button>' +
+        '<button data-act="cycle" title="Change status">&#9679;</button>' +
+      "</div>" +
+      '<div class="proj-head">' +
+        '<span class="dot ' + esc(p.status) + '" title="' + esc(p.status) + '"></span>' +
+        '<span class="proj-name">' + esc(p.name) + "</span>" +
+        '<span class="proj-when">' + esc(p.updated || "") + "</span>" +
+      "</div>" +
+      (p.desc ? '<p class="proj-desc">' + esc(p.desc) + "</p>" : "") +
+      (tags ? '<div class="tags">' + tags + "</div>" : "") +
+      (p.path ? '<div class="proj-path" data-act="path" title="Click to copy">' + esc(p.path) + "</div>" : "") +
+    "</article>";
+}
+
+function renderProjects() {
+  const sorted = projects.slice().sort((a, b) => {
+    const s = (STATUS_ORDER[a.status] ?? 9) - (STATUS_ORDER[b.status] ?? 9);
+    return s !== 0 ? s : String(b.updated || "").localeCompare(String(a.updated || ""));
+  });
+
+  const front = sorted.filter(p => p.status === "active" || p.status === "paused");
+  const rest  = sorted.filter(p => !(p.status === "active" || p.status === "paused"));
+
+  $("#proj-active").innerHTML  = front.length ? front.map(projectCard).join("") :
+    '<div class="empty">No active projects yet. Hit <b>+ Project</b>.</div>';
+  $("#proj-archive").innerHTML = rest.map(projectCard).join("");
+  $("#proj-count").textContent = projects.length;
+  $("#archive-label").textContent = "Archive (" + rest.length + ")";
+  $("#archive-block").hidden = rest.length === 0;
+}
+
+const STATUS_CYCLE = ["active","paused","idea","done","shelved"];
+
+function onProjectClick(ev) {
+  const card = ev.target.closest(".proj");
+  if (!card) return;
+  const p = projects.find(x => x.id === card.dataset.id);
+  if (!p) return;
+  const act = ev.target.dataset.act;
+
+  if (act === "path") {
+    copy(p.path, "Copied " + p.path);
+  } else if (act === "cycle") {
+    p.status = STATUS_CYCLE[(STATUS_CYCLE.indexOf(p.status) + 1) % STATUS_CYCLE.length];
+    persistProjects();
+    toast(p.name + " → " + p.status);
+  } else if (act === "edit") {
+    openProjectDialog(p);
+  }
+}
+
+function openProjectDialog(p) {
+  const f = $("#proj-form");
+  $("#proj-dialog-title").textContent = p ? "Edit project" : "New project";
+  f.elements.id.value     = p ? p.id : "";
+  f.elements.name.value   = p ? p.name : "";
+  f.elements.desc.value   = p ? (p.desc || "") : "";
+  f.elements.tags.value   = p ? (p.tags || []).join(", ") : "";
+  f.elements.path.value   = p ? (p.path || "") : "";
+  f.elements.status.value = p ? p.status : "active";
+  f.elements.updated.value = p ? (p.updated || "") : todayISO();
+  $("#pf-delete").hidden = !p;
+  $("#proj-dialog").showModal();
+}
+
+function todayISO() { return new Date().toISOString().slice(0, 10); }
+
+/* =====================================================================
+   news sources
+   ===================================================================== */
+
+function daysAgoISO(n) {
+  return new Date(Date.now() - n * 86400000).toISOString().slice(0, 10);
+}
+
+async function getJSON(url) {
+  const res = await fetch(url, { headers: { "Accept": "application/json" } });
+  if (!res.ok) throw new Error(res.status + " " + res.statusText);
+  return res.json();
+}
+
+const SOURCES = [
+  {
+    key: "hn",
+    label: "Hacker News",
+    async fetch() {
+      const attrs = "attributesToRetrieve=title,url,points,num_comments,created_at_i,author,objectID";
+      const [front, show] = await Promise.all([
+        getJSON("https://hn.algolia.com/api/v1/search?tags=front_page&hitsPerPage=30&" + attrs),
+        getJSON("https://hn.algolia.com/api/v1/search_by_date?tags=show_hn&hitsPerPage=20&numericFilters=points%3E15&" + attrs),
+      ]);
+      const mk = (h, isShow) => ({
+        id: "hn:" + h.objectID,
+        source: "hn",
+        title: decodeEntities(h.title || ""),
+        url: h.url || ("https://news.ycombinator.com/item?id=" + h.objectID),
+        discuss: "https://news.ycombinator.com/item?id=" + h.objectID,
+        desc: "",
+        tags: isShow ? ["show hn"] : [],
+        points: h.points || 0,
+        comments: h.num_comments || 0,
+        ts: (h.created_at_i || 0) * 1000,
+        meta: (h.points || 0) + " pts · " + (h.num_comments || 0) + " comments" +
+              (h.url ? " · " + hostOf(h.url) : ""),
+      });
+      return front.hits.map(h => mk(h, false)).concat(show.hits.map(h => mk(h, true)));
+    },
+  },
+  {
+    key: "github",
+    label: "GitHub",
+    async fetch() {
+      const q = encodeURIComponent("created:>" + daysAgoISO(21) + " stars:>40");
+      const d = await getJSON("https://api.github.com/search/repositories?q=" + q + "&sort=stars&order=desc&per_page=30");
+      return (d.items || []).map(r => ({
+        id: "gh:" + r.id,
+        source: "github",
+        title: r.full_name,
+        url: r.html_url,
+        desc: decodeEntities(r.description || ""),
+        tags: (r.topics || []).concat(r.language ? [r.language] : []),
+        points: r.stargazers_count || 0,
+        ts: Date.parse(r.created_at) || 0,
+        meta: "★ " + num(r.stargazers_count) + (r.language ? " · " + r.language : "") + " · new repo",
+      }));
+    },
+  },
+  {
+    key: "devto",
+    label: "Dev.to",
+    async fetch() {
+      const d = await getJSON("https://dev.to/api/articles?top=7&per_page=30");
+      return (d || []).map(a => ({
+        id: "dev:" + a.id,
+        source: "devto",
+        title: decodeEntities(a.title),
+        url: a.url,
+        desc: decodeEntities(a.description || "").replace(/\s+/g, " ").trim(),
+        tags: a.tag_list || [],
+        points: a.positive_reactions_count || 0,
+        ts: Date.parse(a.published_at) || 0,
+        meta: (a.positive_reactions_count || 0) + " reactions · " + (a.reading_time_minutes || 1) + " min read",
+      }));
+    },
+  },
+  {
+    key: "hf",
+    label: "Hugging Face",
+    async fetch() {
+      const d = await getJSON("https://huggingface.co/api/models?sort=likes7d&direction=-1&limit=25");
+      return (d || []).map(m => ({
+        id: "hf:" + m.id,
+        source: "hf",
+        title: m.id,
+        url: "https://huggingface.co/" + m.id,
+        desc: [m.pipeline_tag, m.library_name].filter(Boolean).join(" · "),
+        tags: (m.tags || []).filter(t => !t.includes(":") && t.length < 22).concat(m.pipeline_tag ? [m.pipeline_tag] : []),
+        points: m.trendingScore || m.likes || 0,
+        ts: Date.parse(m.createdAt) || 0,
+        meta: "♥ " + num(m.likes) + " · " + num(m.downloads) + " downloads" + (m.pipeline_tag ? " · " + m.pipeline_tag : ""),
+      }));
+    },
+  },
+];
+
+async function fetchNews() {
+  const status = $("#status");
+  status.textContent = "fetching…";
+  if (!items.length) {
+    $("#feed").innerHTML = Array.from({ length: 6 }, () => '<div class="skel"></div>').join("");
+  }
+
+  const results = await Promise.allSettled(SOURCES.map(s => s.fetch()));
+  const collected = [];
+  const errors = [];
+
+  results.forEach((r, i) => {
+    if (r.status === "fulfilled") collected.push(...r.value);
+    else errors.push(SOURCES[i].label + " (" + (r.reason && r.reason.message ? r.reason.message : "failed") + ")");
+  });
+
+  if (collected.length) {
+    // dedupe: one entry per normalised url (the same link often hits HN and Dev.to)
+    const byUrl = new Map();
+    for (const it of collected) {
+      const key = (it.url || it.id)
+        .replace(/^https?:\/\/(www\.)?/, "").replace(/\/+$/, "").toLowerCase();
+      const prev = byUrl.get(key);
+      if (!prev || (it.points || 0) > (prev.points || 0)) byUrl.set(key, it);
+    }
+    items = [...byUrl.values()];
+    save(KEY.cache, { ts: Date.now(), items });
+  }
+
+  const stamp = new Date().toLocaleTimeString([], { hour:"numeric", minute:"2-digit" });
+  status.innerHTML = "updated " + stamp + " · " + items.length + " items from " +
+    (SOURCES.length - errors.length) + "/" + SOURCES.length + " sources" +
+    (errors.length ? ' · <span class="err">offline: ' + esc(errors.join(", ")) + "</span>" : "");
+
+  scoreAll();
+  renderFeed();
+}
+
+/* =====================================================================
+   relevance scoring
+   ===================================================================== */
+
+function interestTerms() {
+  const terms = new Map();  // term -> weight
+  for (const kw of interests.keywords) {
+    const t = String(kw).trim().toLowerCase();
+    if (t) terms.set(t, 2);
+  }
+  // project tags count double, and tags on ACTIVE projects count most
+  for (const p of projects) {
+    if (p.status === "done" || p.status === "shelved") continue;
+    const w = p.status === "active" ? 4 : 3;
+    for (const tag of (p.tags || [])) {
+      const t = String(tag).trim().toLowerCase();
+      if (t) terms.set(t, Math.max(terms.get(t) || 0, w));
+    }
+  }
+  return terms;
+}
+
+function matchTerm(haystack, term) {
+  const i = haystack.indexOf(term);
+  if (i === -1) return false;
+  // require a non-word char on each side so "ai" doesn't match "chair"
+  const before = i === 0 ? " " : haystack[i - 1];
+  const after  = haystack[i + term.length] === undefined ? " " : haystack[i + term.length];
+  return !/[a-z0-9]/.test(before) && !/[a-z0-9]/.test(after);
+}
+
+function scoreOne(it, terms, mutes) {
+  const hay = (it.title + " " + (it.desc || "") + " " + (it.tags || []).join(" ")).toLowerCase();
+
+  it.muted = mutes.some(m => hay.includes(m));
+
+  // Only the three strongest matches count. Without the cap a GitHub repo with a
+  // dozen topic tags always outranks an HN story that has nothing but a title.
+  const hits = [];
+  for (const [term, weight] of terms) {
+    if (matchTerm(hay, term)) hits.push({ term, weight });
+  }
+  hits.sort((a, b) => b.weight - a.weight || a.term.length - b.term.length);
+  const counted = hits.slice(0, 3);
+  it.why = counted.map(h => h.term);
+  it.relevance = counted.reduce((sum, h) => sum + h.weight, 0);
+
+  // popularity, normalised per source so 900 HN points and 900 GH stars are comparable
+  const norm = { hn: 300, github: 900, devto: 150, hf: 800 }[it.source] || 300;
+  const pop = Math.min(1, Math.log10(1 + (it.points || 0)) / Math.log10(1 + norm));
+
+  const ageDays = (Date.now() - (it.ts || 0)) / 86400000;
+  const fresh = Math.exp(-ageDays / 7);   // half-life about 5 days
+
+  it.hotScore = pop * 100 + fresh * 15;
+  it.score = it.relevance * 9 + pop * 55 + fresh * 18;
+}
+
+function scoreAll() {
+  const terms = interestTerms();
+  const mutes = interests.mute.map(m => String(m).trim().toLowerCase()).filter(Boolean);
+  for (const it of items) scoreOne(it, terms, mutes);
+}
+
+/* =====================================================================
+   feed
+   ===================================================================== */
+
+function visibleItems() {
+  const q = query.trim().toLowerCase();
+  let list = items.filter(it => {
+    if (it.muted) return false;
+    if (!prefs.sources[it.source]) return false;
+    if (prefs.savedOnly && !savedIds.has(it.id)) return false;
+    if (q) {
+      const hay = (it.title + " " + (it.desc || "") + " " + (it.tags || []).join(" ")).toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+
+  const cmp = {
+    relevant: (a, b) => b.score - a.score,
+    hot:      (a, b) => b.hotScore - a.hotScore,
+    new:      (a, b) => (b.ts || 0) - (a.ts || 0),
+  }[prefs.sort];
+
+  list.sort(cmp);
+  return prefs.sort === "relevant" ? interleaveBySource(list) : list;
+}
+
+// Scores are not comparable across sources. A GitHub repo carries topic tags and
+// a description, so it racks up keyword matches; an HN story is a bare headline
+// and scores near zero no matter how good it is. Ranking on raw score turns
+// "For me" into a GitHub-only feed. So rank inside each source, then merge by
+// rank: the best HN story sits beside the best repo, second-best beside
+// second-best, and score only breaks ties within a tier.
+function interleaveBySource(list) {
+  const bySource = new Map();
+  for (const it of list) {
+    if (!bySource.has(it.source)) bySource.set(it.source, []);
+    bySource.get(it.source).push(it);
+  }
+  const out = [];
+  for (const group of bySource.values()) {
+    group.sort((a, b) => b.score - a.score);
+    group.forEach((it, i) => { it.tier = i; out.push(it); });
+  }
+  return out.sort((a, b) => a.tier - b.tier || b.score - a.score);
+}
+
+function sparkPrompt(it) {
+  const active = projects
+    .filter(p => p.status === "active")
+    .map(p => "- " + p.name + ": " + (p.desc || "") + " [" + (p.tags || []).join(", ") + "]")
+    .join("\n");
+
+  return [
+    "I read this and want to turn it into something I actually build.",
+    "",
+    "Title: " + it.title,
+    "Link: " + it.url,
+    it.desc ? "Summary: " + it.desc : "",
+    "",
+    "My current projects:",
+    active,
+    "",
+    "Give me three concrete project ideas based on this: one I could finish in a weekend, one that extends a project above, and one that is ambitious. For each, say what I would build, the specific tech, and the first commit I should make.",
+  ].filter(Boolean).join("\n");
+}
+
+function itemCard(it) {
+  const unseen = sessionNew.has(it.id);
+  const isSaved = savedIds.has(it.id);
+  const why = (it.why || []).map(w => '<span class="tag match">' + esc(w) + "</span>").join("");
+
+  return '' +
+    '<article class="item' + (unseen ? " unseen" : "") + '" data-id="' + esc(it.id) + '">' +
+      '<div class="item-src">' +
+        '<span class="src-badge src-' + it.source + '">' + esc(SOURCE_BADGE[it.source] || it.source) + "</span>" +
+        '<span class="meta">' + esc(it.meta || "") + "</span>" +
+      "</div>" +
+      '<h3 class="item-title"><a href="' + esc(it.url) + '" target="_blank" rel="noopener" data-act="open">' + esc(it.title) + "</a></h3>" +
+      (it.desc ? '<p class="item-desc">' + esc(it.desc) + "</p>" : "") +
+      '<div class="item-foot">' +
+        "<span>" + esc(ago(it.ts)) + "</span>" +
+        (it.relevance > 0 ? '<span class="relev">+' + it.relevance + "</span>" : "") +
+        '<div class="why">' + why + "</div>" +
+        '<span class="spacer"></span>' +
+        '<div class="item-tools">' +
+          (it.discuss ? '<a href="' + esc(it.discuss) + '" target="_blank" rel="noopener">discuss</a>' : "") +
+          '<button data-act="save" class="' + (isSaved ? "saved" : "") + '" title="Save to backlog">' + (isSaved ? "&#9733;" : "&#9734;") + "</button>" +
+          '<button data-act="spark" title="Turn into project ideas">spark</button>' +
+        "</div>" +
+      "</div>" +
+    "</article>";
+}
+
+function renderFeed() {
+  const list = visibleItems();
+  const feed = $("#feed");
+  feed.innerHTML = list.length
+    ? list.map(itemCard).join("")
+    : '<div class="empty">' + (items.length ? "Nothing matches those filters." : "No stories loaded yet.") + "</div>";
+  $("#news-count").textContent = list.length;
+
+  const n = list.filter(it => sessionNew.has(it.id)).length;
+  const badge = $("#new-count");
+  badge.hidden = n === 0;
+  badge.textContent = n + " new since last visit";
+}
+
+function onFeedClick(ev) {
+  const card = ev.target.closest(".item");
+  if (!card) return;
+  const it = items.find(x => x.id === card.dataset.id);
+  if (!it) return;
+  const act = ev.target.dataset.act;
+
+  if (act === "open") {
+    markSeen(it.id);
+  } else if (act === "save") {
+    if (savedIds.has(it.id)) savedIds.delete(it.id); else savedIds.add(it.id);
+    save(KEY.saved, [...savedIds]);
+    renderFeed();
+  } else if (act === "spark") {
+    const prompt = sparkPrompt(it);
+    copy(prompt, "Prompt copied — opening Claude");
+    window.open("https://claude.ai/new?q=" + encodeURIComponent(prompt), "_blank", "noopener");
+    markSeen(it.id);
+  }
+}
+
+function markSeen(id) {
+  if (seen.has(id)) return;
+  seen.add(id);
+  // keep the seen set from growing without bound
+  const arr = [...seen];
+  save(KEY.seen, arr.length > 1200 ? arr.slice(-1000) : arr);
+}
+
+/* =====================================================================
+   dialogs
+   ===================================================================== */
+
+function wireProjectDialog() {
+  const dlg = $("#proj-dialog");
+  const f = $("#proj-form");
+
+  $("#pf-cancel").onclick = () => dlg.close();
+
+  $("#pf-delete").onclick = () => {
+    const id = f.elements.id.value;
+    const p = projects.find(x => x.id === id);
+    if (!p) return dlg.close();
+    projects = projects.filter(x => x.id !== id);
+    persistProjects();
+    dlg.close();
+    toast("Removed " + p.name);
+  };
+
+  f.addEventListener("submit", () => {
+    const data = {
+      name:   f.elements.name.value.trim(),
+      desc:   f.elements.desc.value.trim(),
+      tags:   f.elements.tags.value.split(",").map(s => s.trim()).filter(Boolean),
+      path:   f.elements.path.value.trim(),
+      status: f.elements.status.value,
+      updated: f.elements.updated.value || todayISO(),
+    };
+    if (!data.name) return;
+
+    const id = f.elements.id.value;
+    const existing = projects.find(x => x.id === id);
+    if (existing) Object.assign(existing, data);
+    else projects.unshift(Object.assign({ id: "p" + Date.now().toString(36) }, data));
+
+    persistProjects();
+    toast(existing ? "Saved" : "Added " + data.name);
+  });
+}
+
+function wireInterestsDialog() {
+  const dlg = $("#int-dialog");
+  const f = $("#int-form");
+
+  $("#btn-interests").onclick = () => {
+    f.elements.kw.value   = interests.keywords.join("\n");
+    f.elements.mute.value = interests.mute.join("\n");
+    dlg.showModal();
+  };
+  $("#if-cancel").onclick = () => dlg.close();
+
+  const split = (s) => s.split(/[\n,]/).map(x => x.trim().toLowerCase()).filter(Boolean);
+
+  f.addEventListener("submit", () => {
+    interests = { keywords: split(f.elements.kw.value), mute: split(f.elements.mute.value) };
+    save(KEY.interests, interests);
+    scoreAll();
+    renderFeed();
+    toast("Interests updated");
+  });
+}
+
+/* =====================================================================
+   controls
+   ===================================================================== */
+
+function wireControls() {
+  $("#sortseg").addEventListener("click", (ev) => {
+    const b = ev.target.closest("button[data-sort]");
+    if (!b) return;
+    prefs.sort = b.dataset.sort;
+    save(KEY.prefs, prefs);
+    $$("#sortseg button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+    renderFeed();
+  });
+
+  $("#srcchips").addEventListener("click", (ev) => {
+    const b = ev.target.closest("button[data-src]");
+    if (!b) return;
+    const k = b.dataset.src;
+    prefs.sources[k] = !prefs.sources[k];
+    save(KEY.prefs, prefs);
+    b.setAttribute("aria-pressed", String(prefs.sources[k]));
+    renderFeed();
+  });
+
+  $("#chip-saved").addEventListener("click", (ev) => {
+    prefs.savedOnly = !prefs.savedOnly;
+    save(KEY.prefs, prefs);
+    ev.currentTarget.setAttribute("aria-pressed", String(prefs.savedOnly));
+    renderFeed();
+  });
+
+  let searchTimer = null;
+  $("#search").addEventListener("input", (ev) => {
+    clearTimeout(searchTimer);
+    const v = ev.target.value;
+    searchTimer = setTimeout(() => { query = v; renderFeed(); }, 130);
+  });
+
+  $("#btn-refresh").onclick = () => fetchNews();
+  $("#btn-add-proj").onclick = () => openProjectDialog(null);
+
+  $("#btn-export").onclick = () => {
+    copy(JSON.stringify(projects, null, 2), "Projects JSON copied to clipboard");
+  };
+
+  $("#proj-active").addEventListener("click", onProjectClick);
+  $("#proj-archive").addEventListener("click", onProjectClick);
+  $("#feed").addEventListener("click", onFeedClick);
+
+  document.addEventListener("keydown", (ev) => {
+    if (ev.target.matches("input, textarea, select")) {
+      if (ev.key === "Escape") ev.target.blur();
+      return;
+    }
+    if (document.querySelector("dialog[open]")) return;
+    if (ev.key === "/") { ev.preventDefault(); $("#search").focus(); }
+    if (ev.key === "r") fetchNews();
+    if (ev.key === "n") openProjectDialog(null);
+  });
+}
+
+/* =====================================================================
+   boot
+   ===================================================================== */
+
+function applyPrefsToUI() {
+  $$("#sortseg button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.sort === prefs.sort)));
+  $$("#srcchips button").forEach(b => b.setAttribute("aria-pressed", String(!!prefs.sources[b.dataset.src])));
+  $("#chip-saved").setAttribute("aria-pressed", String(!!prefs.savedOnly));
+}
+
+function init() {
+  tickClock();
+  setInterval(tickClock, 15000);
+  renderSubline();
+  renderProjects();
+  applyPrefsToUI();
+  wireProjectDialog();
+  wireInterestsDialog();
+  wireControls();
+
+  // paint instantly from cache, then refresh if it is stale
+  const firstVisit = seen.size === 0;
+  const cache = load(KEY.cache, null);
+  if (cache && Array.isArray(cache.items) && cache.items.length) {
+    items = cache.items;
+    if (!firstVisit) for (const it of items) if (!seen.has(it.id)) sessionNew.add(it.id);
+    scoreAll();
+    renderFeed();
+    $("#status").textContent = "cached " + ago(cache.ts) + " ago";
+  }
+
+  const stale = !cache || (Date.now() - (cache.ts || 0)) > 25 * 60 * 1000;
+  if (stale) {
+    fetchNews().then(() => {
+      if (!firstVisit) for (const it of items) if (!seen.has(it.id)) sessionNew.add(it.id);
+      renderFeed();
+    }).catch(err => {
+      $("#status").innerHTML = '<span class="err">feed failed: ' + esc(err.message) + "</span>";
+    });
+  }
+
+  // mark everything seen when leaving, so "new" means new next time
+  window.addEventListener("pagehide", () => {
+    for (const it of items) seen.add(it.id);
+    const arr = [...seen];
+    save(KEY.seen, arr.length > 1200 ? arr.slice(-1000) : arr);
+  });
+}
+
+init();
+</script>
+</body>
+</html>
