@@ -88,9 +88,9 @@
   .top-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 
   .btn {
-    background: var(--panel);
-    border: 1px solid var(--line);
-    color: var(--text);
+    background: #dce8f6;
+    border: 1px solid #bcd0e6;
+    color: #1e2733;
     border-radius: 8px;
     padding: 7px 12px;
     font-size: 13px;
@@ -99,25 +99,25 @@
     transition: background .13s ease, border-color .13s ease, color .13s ease;
     white-space: nowrap;
   }
-  .btn:hover { background: var(--panel-2); border-color: #33405e; }
-  .btn.primary { background: #23345c; border-color: #33507f; color: #dce6ff; }
-  .btn.primary:hover { background: #2a3e6d; }
-  .btn.ghost { background: transparent; }
-  .btn.ghost:hover { background: var(--panel); }
-  .btn[aria-pressed="true"] { background: #23345c; border-color: #3a527f; color: #dce6ff; }
+  .btn:hover { background: #e7f0fa; border-color: #9dbadb; }
+  .btn.primary { background: #9dc2ea; border-color: #79a6d8; color: #12243a; font-weight: 600; }
+  .btn.primary:hover { background: #b0cfef; border-color: #6b9bd2; }
+  .btn.ghost { background: #eaf2fb; }
+  .btn.ghost:hover { background: #dce8f6; }
+  .btn[aria-pressed="true"] { background: #9dc2ea; border-color: #79a6d8; color: #12243a; }
 
   .quicklinks { display: flex; gap: 6px; }
   .quicklinks a {
     display: grid; place-items: center;
     width: 32px; height: 32px;
-    border: 1px solid var(--line);
+    border: 1px solid #bcd0e6;
     border-radius: 8px;
-    background: var(--panel);
+    background: #dce8f6;
     font-size: 13px;
-    color: var(--muted);
+    color: #3d4d61;
     transition: all .13s ease;
   }
-  .quicklinks a:hover { color: var(--text); border-color: #33405e; background: var(--panel-2); }
+  .quicklinks a:hover { color: #12243a; border-color: #9dbadb; background: #e7f0fa; }
 
   /* ---------- layout ---------- */
 
@@ -294,9 +294,9 @@
   }
 
   .chip {
-    background: var(--panel);
-    border: 1px solid var(--line-soft);
-    color: var(--muted);
+    background: #dce8f6;
+    border: 1px solid #bcd0e6;
+    color: #3d4d61;
     border-radius: 20px;
     padding: 4px 11px;
     font-size: 12px;
@@ -304,16 +304,17 @@
     font-family: inherit;
     transition: all .13s ease;
   }
-  .chip:hover { color: var(--text); border-color: #33405e; }
-  .chip[aria-pressed="true"] { background: #23345c; border-color: #3a527f; color: #dce6ff; }
+  .chip:hover { color: #12243a; background: #e7f0fa; border-color: #9dbadb; }
+  .chip[aria-pressed="true"] { background: #9dc2ea; border-color: #79a6d8; color: #12243a; font-weight: 600; }
 
-  .seg { display: inline-flex; background: var(--panel); border: 1px solid var(--line-soft); border-radius: 8px; overflow: hidden; }
+  .seg { display: inline-flex; background: #dce8f6; border: 1px solid #bcd0e6; border-radius: 8px; overflow: hidden; }
   .seg button {
-    background: transparent; border: 0; color: var(--muted);
+    background: transparent; border: 0; color: #3d4d61;
     font-family: inherit; font-size: 12px; padding: 5px 11px; cursor: pointer;
   }
-  .seg button + button { border-left: 1px solid var(--line-soft); }
-  .seg button[aria-pressed="true"] { background: #23345c; color: #dce6ff; }
+  .seg button + button { border-left: 1px solid #bcd0e6; }
+  .seg button:hover { background: #e7f0fa; color: #12243a; }
+  .seg button[aria-pressed="true"] { background: #9dc2ea; color: #12243a; font-weight: 600; }
 
   input.search {
     background: var(--panel);
@@ -632,7 +633,7 @@
       </select>
     </div>
     <div class="dialog-actions">
-      <button type="button" class="btn left" id="pf-delete" style="color:#f7768e">Delete</button>
+      <button type="button" class="btn left" id="pf-delete" style="color:#a3243a">Delete</button>
       <button type="button" class="btn" id="pf-cancel">Cancel</button>
       <button type="submit" class="btn primary" value="save">Save</button>
     </div>
